@@ -1,6 +1,7 @@
 package com.dallotech.config;
 
 import com.dallotech.security.CustomUserDetailsService;
+import com.dallotech.security.RestAuthenticationEntryPoint;
 import com.dallotech.security.TokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -28,8 +30,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    @Autowired
-//    private AccessDeniedHandler accessDeniedHandler;
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -74,7 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .httpBasic()
                 .disable()
-                .exceptionHandling()
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
                 .antMatchers("/",
