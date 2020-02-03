@@ -1,6 +1,7 @@
 package com.anuj.qrscanner.controller;
 
 import com.anuj.qrscanner.model.db.User;
+import com.anuj.qrscanner.model.dto.request.TransactionDecisionRequestDto;
 import com.anuj.qrscanner.model.dto.request.TransactionRequestDto;
 import com.anuj.qrscanner.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class TransactionController {
 
     @PostMapping(value = "/transaction")
     public ResponseEntity<?> postTransactionDto(User user, TransactionRequestDto transactionRequestDto){
-        return null;
+        return transactionService.createTransaction(user,transactionRequestDto);
+    }
+
+    @PostMapping(value = "/transaction_decision")
+    public ResponseEntity<?> transactionDecision(User user, TransactionDecisionRequestDto transactionDecisionRequestDto){
+        return transactionService.transactionDecision(user, transactionDecisionRequestDto);
     }
 }

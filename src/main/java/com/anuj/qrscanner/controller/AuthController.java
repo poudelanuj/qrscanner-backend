@@ -10,10 +10,9 @@ import com.anuj.qrscanner.model.db.VerificationToken;
 import com.anuj.qrscanner.model.dto.request.LoginRequestDto;
 import com.anuj.qrscanner.model.dto.request.OtpRequestDto;
 import com.anuj.qrscanner.model.dto.response.LoginResponse;
-import com.anuj.qrscanner.payload.AuthResponse;
+import com.anuj.qrscanner.payload.ServerResponse;
 import com.anuj.qrscanner.repository.UserRepository;
 import com.anuj.qrscanner.security.TokenProvider;
-import com.anuj.qrscanner.security.UserPrincipal;
 import com.anuj.qrscanner.service.MessageService;
 import com.anuj.qrscanner.service.RoleService;
 import com.anuj.qrscanner.service.VerificationTokenService;
@@ -27,6 +26,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,8 +36,6 @@ import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-
-import static com.anuj.qrscanner.constant.TokenStatus.*;
 
 @RestController
 @RequestMapping(Urls.AUTH_BASE_URL)
@@ -55,10 +53,12 @@ public class AuthController {
     AuthenticationManager authenticationManager;
     @Autowired
     private TokenProvider tokenProvider;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @ApiOperation(value = "Login/Register New User")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "User successfully registered.", response = AuthResponse.class),})
+            @ApiResponse(code = 200, message = "User successfully registered.", response = ServerResponse.class),})
     @PostMapping(value = "/login")
     public ResponseEntity<?> loginOrRegister(@Valid @RequestBody LoginRequestDto loginRequestDto) throws RoleNotFountException {
         Optional<User> userOptional = userRepository.findByPhoneNumber(loginRequestDto.getPhoneNumber());
@@ -68,6 +68,7 @@ public class AuthController {
             user = new User();
             user.setPhoneNumber(loginRequestDto.getPhoneNumber());
             user.setCurrentBalance(0);
+            user.setPassword(passwordEncoder.encode(loginRequestDto.getPhoneNumber()));
             Set<Role> roles = new HashSet<>();
             roles.add(roleService.getParticularRole(RoleName.USER));
             user.setRoles(roles);
@@ -76,6 +77,7 @@ public class AuthController {
             user = userOptional.get();
         }
         VerificationToken verificationToken = verificationTokenService.generateNewVerificationToken(user);
+        System.out.println(verificationToken.getToken());
         // todo send SMS verification token
         return messageService.sendMessageWithVerificationCode(verificationToken);
 
@@ -87,13 +89,13 @@ public class AuthController {
 
         switch (tokenStatus){
             case TOKEN_INVALID:{
-                return new ResponseEntity<>(new AuthResponse(false, "Token is Invalid"), HttpStatus.CONFLICT);
+                return new ResponseEntity<>(new ServerResponse(false, "Token is Invalid"), HttpStatus.CONFLICT);
             }
             case TOKEN_EXPIRED_NEW_TOKEN_SENT:{
-                return new ResponseEntity<>(new AuthResponse(false, "Token Expired. New Verification Token is send to your mail."), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new ServerResponse(false, "Token Expired. New Verification Token is send to your mail."), HttpStatus.NOT_FOUND);
             }
             case TOKEN_EXPIRED_NEW_TOKEN_NOT_SENT:{
-                return new ResponseEntity<>(new AuthResponse(false, "Token Expired. Please try again later"), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new ServerResponse(false, "Token Expired. Please try again later"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
             case TOKEN_VALID:{
                 Optional<User> userOptional = userRepository.findByPhoneNumber(otpRequestDto.getPhoneNumber());
@@ -108,7 +110,7 @@ public class AuthController {
                     String token = tokenProvider.createToken(authentication);
                     return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
                 }
-                return ResponseEntity.ok(new AuthResponse(true, "Account Verified"));
+                return ResponseEntity.ok(new ServerResponse(true, "Account Verified"));
             }
 
         }

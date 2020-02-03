@@ -4,21 +4,15 @@ import com.anuj.qrscanner.constant.TokenStatus;
 import com.anuj.qrscanner.model.db.User;
 import com.anuj.qrscanner.model.db.VerificationToken;
 import com.anuj.qrscanner.model.dto.request.OtpRequestDto;
-import com.anuj.qrscanner.payload.AuthResponse;
 import com.anuj.qrscanner.repository.UserRepository;
 import com.anuj.qrscanner.repository.VerificationTokenRepository;
 import com.nexmo.client.sms.MessageStatus;
 import com.nexmo.client.sms.SmsSubmissionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-
-import static io.jsonwebtoken.Claims.EXPIRATION;
 
 @Service("tokenService")
 public class VerificationTokenService {

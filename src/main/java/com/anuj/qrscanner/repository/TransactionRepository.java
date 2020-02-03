@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    List<Transaction> findAllBySerderUser(User user);
+    List<Transaction> findAllBySenderUser(User user);
 
     List<Transaction> findAllByReceiverUser(User user);
 

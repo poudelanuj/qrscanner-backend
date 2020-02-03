@@ -1,5 +1,6 @@
 package com.anuj.qrscanner.model.db;
 
+import com.anuj.qrscanner.constant.TransactionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,14 +18,14 @@ public class Transaction {
     @Id
     @Column(name="id_transaction")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idUser;
+    private Long idTransaction;
 
     @Column(name = "transaction_value")
     private double transactionValue;
 
     @ManyToOne
     @JoinColumn(name = "sender_id_user")
-    private User serderUser;
+    private User senderUser;
 
     @ManyToOne
     @JoinColumn(name = "receiver_id_user")
@@ -38,9 +39,9 @@ public class Transaction {
     @Column(name = "transaction_accept_time", nullable = false)
     private Timestamp transactionAcceptTime;
 
-
-    @Column(name = "pending")
-    private boolean pending = true;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_status")
+    private TransactionStatus transactionStatus;
 
 
 }

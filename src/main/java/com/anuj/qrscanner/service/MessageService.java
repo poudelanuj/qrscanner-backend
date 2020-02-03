@@ -1,7 +1,7 @@
 package com.anuj.qrscanner.service;
 
 import com.anuj.qrscanner.model.db.VerificationToken;
-import com.anuj.qrscanner.payload.AuthResponse;
+import com.anuj.qrscanner.payload.ServerResponse;
 import com.nexmo.client.HttpConfig;
 import com.nexmo.client.NexmoClient;
 import com.nexmo.client.sms.MessageStatus;
@@ -26,9 +26,9 @@ public class MessageService {
 
         SmsSubmissionResponse response = sendSMS(verificationToken);
         if (response.getMessages().get(0).getStatus() == MessageStatus.OK) {
-            return ResponseEntity.ok(new AuthResponse(true, "Verification Token Sent successfully"));
+            return ResponseEntity.ok(new ServerResponse(true, "Verification Token Sent successfully"));
         } else {
-            return new ResponseEntity<>(new AuthResponse(false, "Please Try again later"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServerResponse(false, "Please Try again later"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -40,6 +40,13 @@ public class MessageService {
         return  client.getSmsClient().submitMessage(message);
     }
 
+    public SmsSubmissionResponse sendInvitationSMS(String receiverPhoneNumber){
+        TextMessage message = new TextMessage("QR Wallet",
+                receiverPhoneNumber,
+                "Invitation Link: Please install QR wallet to receive digital cash"
+        );
+        return  client.getSmsClient().submitMessage(message);
+    }
 
 
 
