@@ -27,6 +27,9 @@ public class User {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
+    @Column(name = "password", unique = true)
+    private String password;
+
     @Column(name = "current_balance")
     private double currentBalance;
 

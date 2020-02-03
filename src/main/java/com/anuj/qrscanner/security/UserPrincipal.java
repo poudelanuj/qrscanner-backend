@@ -16,13 +16,8 @@ import java.util.*;
 @Data
 public class UserPrincipal implements UserDetails {
     private User user;
-    private Map<String, Object> attributes;
     public UserPrincipal(User user){
         this.user = user;
-    }
-    public UserPrincipal(User user,Map<String, Object> attributes){
-        this.user = user;
-        this.attributes = attributes;
     }
 
     @Override
@@ -37,7 +32,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPhoneNumber();
+        return user.getPassword();
     }
 
     @Override
@@ -57,7 +52,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override

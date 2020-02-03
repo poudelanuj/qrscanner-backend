@@ -27,6 +27,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +56,8 @@ public class AuthController {
     AuthenticationManager authenticationManager;
     @Autowired
     private TokenProvider tokenProvider;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @ApiOperation(value = "Login/Register New User")
     @ApiResponses(value = {
@@ -68,6 +71,7 @@ public class AuthController {
             user = new User();
             user.setPhoneNumber(loginRequestDto.getPhoneNumber());
             user.setCurrentBalance(0);
+            user.setPassword(passwordEncoder.encode(loginRequestDto.getPhoneNumber()));
             Set<Role> roles = new HashSet<>();
             roles.add(roleService.getParticularRole(RoleName.USER));
             user.setRoles(roles);
@@ -76,8 +80,10 @@ public class AuthController {
             user = userOptional.get();
         }
         VerificationToken verificationToken = verificationTokenService.generateNewVerificationToken(user);
+        System.out.println(verificationToken.getToken());
         // todo send SMS verification token
-        return messageService.sendMessageWithVerificationCode(verificationToken);
+        return ResponseEntity.ok(true);
+              //  messageService.sendMessageWithVerificationCode(verificationToken);
 
     }
 

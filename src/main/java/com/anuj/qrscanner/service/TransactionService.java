@@ -13,6 +13,7 @@ public class TransactionService {
     TransactionRepository transactionRepository;
 
 
-
-
+    public ResponseEntity<?> getAllTransaction(User user) {
+        return null;
+    }
 }

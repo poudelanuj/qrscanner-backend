@@ -4,7 +4,7 @@ spring:
       ?useSSL=false
       &createDatabaseIfNotExist=true
     username: root
-    password: root
+    password: sagar
     driver-class-name: com.mysql.jdbc.Driver
 
 #  flyway:
