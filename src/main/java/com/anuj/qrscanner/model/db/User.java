@@ -1,5 +1,6 @@
-package com.anuj.qrscanner.model;
+package com.anuj.qrscanner.model.db;
 
+import com.anuj.qrscanner.model.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class User {
             joinColumns = @JoinColumn(name = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_role"))
     private Set<Role> roles = new HashSet<>();
+
 
 
 }

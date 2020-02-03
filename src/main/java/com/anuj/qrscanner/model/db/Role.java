@@ -1,4 +1,4 @@
-package com.anuj.qrscanner.model;
+package com.anuj.qrscanner.model.db;
 
 import com.anuj.qrscanner.constant.RoleName;
 import lombok.AllArgsConstructor;

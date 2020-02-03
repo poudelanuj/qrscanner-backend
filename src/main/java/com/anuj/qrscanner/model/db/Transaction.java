@@ -1,4 +1,4 @@
-package com.anuj.qrscanner.model;
+package com.anuj.qrscanner.model.db;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -40,8 +39,8 @@ public class Transaction {
     private Timestamp transactionAcceptTime;
 
 
-    @Column(name = "accepted")
-    private boolean accepted = false;
+    @Column(name = "pending")
+    private boolean pending = true;
 
 
 }

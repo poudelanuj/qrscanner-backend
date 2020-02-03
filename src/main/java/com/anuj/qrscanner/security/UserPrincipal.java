@@ -1,19 +1,14 @@
 package com.anuj.qrscanner.security;
 
 
-import com.anuj.qrscanner.model.Role;
-import com.anuj.qrscanner.model.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
+import com.anuj.qrscanner.model.db.Role;
+import com.anuj.qrscanner.model.db.User;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 
 // custom UserDetails class
@@ -42,22 +37,22 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return user.getPhoneNumber();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return user.getPhoneNumber();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
@@ -67,7 +62,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
     private List<String> getPrivileges(Collection<Role> roles) {

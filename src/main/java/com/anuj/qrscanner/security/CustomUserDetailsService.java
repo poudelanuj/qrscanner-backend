@@ -2,7 +2,7 @@ package com.anuj.qrscanner.security;
 
 
 import com.anuj.qrscanner.exception.UserNotFoundException;
-import com.anuj.qrscanner.model.User;
+import com.anuj.qrscanner.model.db.User;
 import com.anuj.qrscanner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

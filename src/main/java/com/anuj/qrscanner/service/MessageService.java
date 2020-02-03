@@ -1,0 +1,47 @@
+package com.anuj.qrscanner.service;
+
+import com.anuj.qrscanner.model.db.VerificationToken;
+import com.anuj.qrscanner.payload.AuthResponse;
+import com.nexmo.client.HttpConfig;
+import com.nexmo.client.NexmoClient;
+import com.nexmo.client.sms.MessageStatus;
+import com.nexmo.client.sms.SmsSubmissionResponse;
+import com.nexmo.client.sms.messages.TextMessage;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MessageService {
+
+    HttpConfig httpConfig = HttpConfig.defaultConfig();
+    NexmoClient client = NexmoClient
+                            .builder()
+                            .apiKey("652b9a56")
+                            .apiSecret("0oSFuscWWKu2B9Ym")
+                            .build();
+
+
+    public ResponseEntity<?> sendMessageWithVerificationCode(VerificationToken verificationToken){
+
+        SmsSubmissionResponse response = sendSMS(verificationToken);
+        if (response.getMessages().get(0).getStatus() == MessageStatus.OK) {
+            return ResponseEntity.ok(new AuthResponse(true, "Verification Token Sent successfully"));
+        } else {
+            return new ResponseEntity<>(new AuthResponse(false, "Please Try again later"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public SmsSubmissionResponse sendSMS(VerificationToken verificationToken){
+        TextMessage message = new TextMessage("QR Wallet",
+                verificationToken.getUser().getPhoneNumber(),
+                "Verification Token: "+ verificationToken.getToken()
+        );
+        return  client.getSmsClient().submitMessage(message);
+    }
+
+
+
+
+
+}
