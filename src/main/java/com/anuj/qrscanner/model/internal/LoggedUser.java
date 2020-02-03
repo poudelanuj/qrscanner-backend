@@ -1,6 +1,6 @@
-package com.dallotech.model.internal;
+package com.anuj.qrscanner.model.internal;
 
-import com.dallotech.model.User;
+import com.anuj.qrscanner.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +13,9 @@ import java.util.UUID;
 @NoArgsConstructor
 
 public class LoggedUser {
-    private Long userId;
+    private UUID userId;
     private Boolean isUser;
-    private Boolean isAdmin;
+//    private Boolean isAdmin;
     private User user;
     private Set<String> roles;
 

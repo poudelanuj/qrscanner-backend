@@ -1,4 +1,4 @@
-package com.dallotech.security;
+package com.anuj.qrscanner.security;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

@@ -1,5 +1,6 @@
 package com.anuj.qrscanner;
 
+
 import com.anuj.qrscanner.config.AppProperties;
 import com.anuj.qrscanner.config.FileStorageProperties;
 import org.springframework.boot.SpringApplication;
@@ -9,10 +10,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication(scanBasePackages = {"com.anuj.qrscanner"}, exclude = {SecurityAutoConfiguration.class})
 @EnableConfigurationProperties({AppProperties.class, FileStorageProperties.class})
-public class Application {
+public class QrScannerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(QrScannerApplication.class, args);
 	}
 
 }

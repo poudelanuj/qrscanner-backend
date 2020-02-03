@@ -1,5 +1,6 @@
-package com.dallotech.model;
+package com.anuj.qrscanner.model;
 
+import com.anuj.qrscanner.constant.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,13 +25,5 @@ public class Role {
     @Column(name = "role_name",length = 60)
     private RoleName roleName;
 
-
-    public enum  RoleName {
-        USER,
-        ADMIN,
-        ARTIST,
-        ORGANIZATION,
-        INVESTOR
-    }
 
 }

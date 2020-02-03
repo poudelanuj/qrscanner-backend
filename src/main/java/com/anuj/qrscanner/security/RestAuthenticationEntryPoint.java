@@ -1,4 +1,4 @@
-package com.dallotech.security;
+package com.anuj.qrscanner.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

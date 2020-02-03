@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 @Data
-@ApiModel(subTypes = {DocpressErrorMessage.class, WordPressUserUnverifiedException.class}, discriminator = "type",
+@ApiModel(subTypes = {QrScannerErrorMessage.class}, discriminator = "type",
         description = "Supertype of all error thrown.")
-public abstract class DocPressException extends Exception {
+public abstract class QrScannerException extends Exception {
     public abstract HttpStatus httpStatus();
     public  abstract String code();
     public abstract String error();

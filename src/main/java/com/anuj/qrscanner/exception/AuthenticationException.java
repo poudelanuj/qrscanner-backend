@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Accessors(fluent = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AuthenticationException extends DocPressException {
+public class AuthenticationException extends QrScannerException {
     private HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
     private String code = "AUTHENTICATION_EXCEPTION";
     private String error="Please authenticate to access this resource.";

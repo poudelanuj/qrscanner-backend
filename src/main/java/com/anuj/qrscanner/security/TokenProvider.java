@@ -1,6 +1,6 @@
-package com.dallotech.security;
+package com.anuj.qrscanner.security;
 
-import com.dallotech.config.AppProperties;
+import com.anuj.qrscanner.config.AppProperties;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         return Jwts.builder()
-                .setSubject((userPrincipal.getId().toString()))
+                .setSubject((userPrincipal.getUser().getIdUser().toString()))
      //verifies the roles given to particular user
                 .claim("roles",authorities)
                 .setIssuedAt(new Date())
@@ -46,13 +46,13 @@ public class TokenProvider {
                 .compact();
     }
 
-    public Long getUserIdFromToken(String token) {
+    public UUID getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(appProperties.getAuth().getTokenSecret())
                 .parseClaimsJws(token)
                 .getBody();
 
-        return Long.parseLong(claims.getSubject());
+        return UUID.fromString(claims.getSubject());
     }
 
     public boolean validateToken(String authToken) {

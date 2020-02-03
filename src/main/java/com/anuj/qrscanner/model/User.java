@@ -1,14 +1,11 @@
-package com.dallotech.model;
+package com.anuj.qrscanner.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.*;
 
 @Entity
@@ -16,21 +13,21 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-
-
 public class User {
 
+
     @Id
-    @Column(name="id_user")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idUser;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id_user", updatable = false, columnDefinition = "BINARY(16)")
+    private UUID idUser;
 
-    @Column(name="email",unique = true)
-    String email;
 
-    @Column(name="password")
-    String password;
+    @Column(name = "phone_number", unique = true)
+    private String phoneNumber;
 
+    @Column(name = "current_balance")
+    private double currentBalance;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

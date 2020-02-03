@@ -1,4 +1,4 @@
-package com.dallotech.config;
+package com.anuj.qrscanner.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

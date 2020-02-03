@@ -1,4 +1,4 @@
-package com.dallotech.exception;
+package com.anuj.qrscanner.exception;
 
 
 

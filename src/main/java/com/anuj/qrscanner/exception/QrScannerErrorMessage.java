@@ -11,15 +11,15 @@ import org.springframework.http.HttpStatus;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@ApiModel(parent = Q.class, description = "Class representing docpress general error")
-public class DocpressErrorMessage extends DocPressException {
+@ApiModel(parent = QrScannerException.class, description = "Class representing p2p QR Wallet general error")
+public class QrScannerErrorMessage extends QrScannerException {
     private HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     private String code = "ERROR_OCCURRED";
     private String error="Error Occurred";
     private String desc;
     private String data;
 
-    public DocpressErrorMessage(String errorMessage){
+    public QrScannerErrorMessage(String errorMessage){
         this.error = errorMessage;
     }
 }

@@ -1,17 +1,17 @@
-package com.dallotech.repository;
+package com.anuj.qrscanner.repository;
 
 
-import com.dallotech.model.User;
+import com.anuj.qrscanner.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-     Optional<User> findByEmail(String email);
+    Optional<User> findByPhoneNumber(String phoneNumber);
 
-     Boolean existsByEmail(String email);
+
 
 
 }
