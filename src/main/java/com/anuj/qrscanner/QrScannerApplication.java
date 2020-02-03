@@ -1,13 +1,13 @@
-package com.dallotech;
+package com.anuj.qrscanner;
 
-import com.dallotech.config.AppProperties;
-import com.dallotech.config.FileStorageProperties;
+import com.anuj.qrscanner.config.AppProperties;
+import com.anuj.qrscanner.config.FileStorageProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@SpringBootApplication(scanBasePackages = {"com.dallotech"}, exclude = {SecurityAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = {"com.anuj.qrscanner"}, exclude = {SecurityAutoConfiguration.class})
 @EnableConfigurationProperties({AppProperties.class, FileStorageProperties.class})
 public class Application {
 
