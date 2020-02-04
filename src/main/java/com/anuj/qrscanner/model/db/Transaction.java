@@ -1,12 +1,14 @@
 package com.anuj.qrscanner.model.db;
 
 import com.anuj.qrscanner.constant.TransactionStatus;
+import com.anuj.qrscanner.constant.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Data
@@ -24,24 +26,27 @@ public class Transaction {
     private double transactionValue;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id_user")
-    private User senderUser;
+    @JoinColumn(name = "source_id_user")
+    private User sourceUser;
 
     @ManyToOne
-    @JoinColumn(name = "receiver_id_user")
-    private User receiverUser;
+    @JoinColumn(name = "destination_id_user")
+    private User destinationUser;
 
     @Basic
-    @Column(name = "transaction_start_time", nullable = false)
-    private Timestamp transactionStartTime;
+    @Column(name = "transaction_start_date", nullable = false)
+    private Date transactionStartDate;
 
     @Basic
-    @Column(name = "transaction_accept_time", nullable = false)
-    private Timestamp transactionAcceptTime;
+    @Column(name = "transaction_accept_date", nullable = false)
+    private Date transactionAcceptDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_type")
+    private TransactionType transactionType;
 
 }

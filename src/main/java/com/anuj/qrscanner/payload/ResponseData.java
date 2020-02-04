@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServerResponse {
-
-    @JsonProperty("data")
-    public ResponseData data;
-
+public class ResponseData {
+    @JsonProperty("success")
+    private boolean success;
+    @JsonProperty("message")
+    private String message;
 }

@@ -1,4 +1,4 @@
-package com.anuj.qrscanner.model.dto.response;
+package com.anuj.qrscanner.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
 
-    @JsonProperty("access_token")
-    private String accessToken;
-    @JsonProperty("token_type")
-    private String tokenType = "Bearer";
+    @JsonProperty("data")
+    private LoginResponseData loginResponseData;
+
 
 }

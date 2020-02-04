@@ -9,8 +9,7 @@ import com.anuj.qrscanner.model.db.User;
 import com.anuj.qrscanner.model.db.VerificationToken;
 import com.anuj.qrscanner.model.dto.request.LoginRequestDto;
 import com.anuj.qrscanner.model.dto.request.OtpRequestDto;
-import com.anuj.qrscanner.model.dto.response.LoginResponse;
-import com.anuj.qrscanner.payload.ServerResponse;
+import com.anuj.qrscanner.payload.*;
 import com.anuj.qrscanner.repository.UserRepository;
 import com.anuj.qrscanner.security.TokenProvider;
 import com.anuj.qrscanner.service.MessageService;
@@ -58,7 +57,9 @@ public class AuthController {
 
     @ApiOperation(value = "Login/Register New User")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "User successfully registered.", response = ServerResponse.class),})
+            @ApiResponse(code = 200, message = "User successfully registered. Sms has been sent", response = ServerResponse.class),
+            @ApiResponse(code = 500, message = "SMS cannot be sent, Internal server error", response = ErrorResponse.class)
+    })
     @PostMapping(value = "/login")
     public ResponseEntity<?> loginOrRegister(@Valid @RequestBody LoginRequestDto loginRequestDto) throws RoleNotFountException {
         Optional<User> userOptional = userRepository.findByPhoneNumber(loginRequestDto.getPhoneNumber());
@@ -77,25 +78,32 @@ public class AuthController {
             user = userOptional.get();
         }
         VerificationToken verificationToken = verificationTokenService.generateNewVerificationToken(user);
-        System.out.println(verificationToken.getToken());
-        // todo send SMS verification token
         return messageService.sendMessageWithVerificationCode(verificationToken);
 
     }
 
+    @ApiOperation(value = "OTP Verification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OTP verified successfully.", response = LoginResponse.class),
+            @ApiResponse(code = 403, message = "Token Invalid",response = ErrorResponse.class),
+            @ApiResponse(code = 409, message = "Token Expired. New Verification Token is send to your mail.",response = ErrorResponse.class),
+            @ApiResponse(code = 403, message = "Token Expired. Please try again later",response = ErrorResponse.class),
+            @ApiResponse(code = 404, message = "User Not present",response = ErrorResponse.class)
+
+    })
     @PostMapping(value = "/otp")
     public ResponseEntity<?> postOtp(@Valid @RequestBody OtpRequestDto otpRequestDto) {
         TokenStatus tokenStatus = verificationTokenService.validateVerificationToken(otpRequestDto);
 
         switch (tokenStatus){
             case TOKEN_INVALID:{
-                return new ResponseEntity<>(new ServerResponse(false, "Token is Invalid"), HttpStatus.CONFLICT);
+                return new ResponseEntity<>(new ErrorResponse("Token Invalid", new ValidationError()), HttpStatus.FORBIDDEN);
             }
             case TOKEN_EXPIRED_NEW_TOKEN_SENT:{
-                return new ResponseEntity<>(new ServerResponse(false, "Token Expired. New Verification Token is send to your mail."), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new ErrorResponse("Token Expired. New Verification Token is send to your mail.",new ValidationError()), HttpStatus.CONFLICT);
             }
             case TOKEN_EXPIRED_NEW_TOKEN_NOT_SENT:{
-                return new ResponseEntity<>(new ServerResponse(false, "Token Expired. Please try again later"), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new ErrorResponse("Token Expired. Please try again later", new ValidationError()), HttpStatus.INTERNAL_SERVER_ERROR);
             }
             case TOKEN_VALID:{
                 Optional<User> userOptional = userRepository.findByPhoneNumber(otpRequestDto.getPhoneNumber());
@@ -108,9 +116,9 @@ public class AuthController {
                     );
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     String token = tokenProvider.createToken(authentication);
-                    return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
+                    return ResponseEntity.ok(new LoginResponse(new LoginResponseData(true,token, "Bearer" )));
                 }
-                return ResponseEntity.ok(new ServerResponse(true, "Account Verified"));
+                return new ResponseEntity<>(new ErrorResponse("User Not present",new ValidationError()),HttpStatus.NOT_FOUND);
             }
 
         }

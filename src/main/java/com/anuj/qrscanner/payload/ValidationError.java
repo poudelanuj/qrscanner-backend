@@ -5,12 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServerResponse {
+public class ValidationError {
 
-    @JsonProperty("data")
-    public ResponseData data;
-
+    @JsonProperty("name")
+    private List<String> nameList;
 }

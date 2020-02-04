@@ -1,5 +1,6 @@
 package com.anuj.qrscanner.model.dto.request;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionRequestDto {
+public class TransactionInitiateDto {
 
-    @JsonProperty("sender_phone_number")
-    private String senderPhoneNumber;
+    @JsonProperty("receiver_phone_number")
+    private String receiverPhoneNumber;
     @JsonProperty("transaction_amount")
     private double transactionAmount;
 

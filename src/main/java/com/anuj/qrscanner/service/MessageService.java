@@ -1,7 +1,10 @@
 package com.anuj.qrscanner.service;
 
 import com.anuj.qrscanner.model.db.VerificationToken;
+import com.anuj.qrscanner.payload.ErrorResponse;
+import com.anuj.qrscanner.payload.ResponseData;
 import com.anuj.qrscanner.payload.ServerResponse;
+import com.anuj.qrscanner.payload.ValidationError;
 import com.nexmo.client.HttpConfig;
 import com.nexmo.client.NexmoClient;
 import com.nexmo.client.sms.MessageStatus;
@@ -10,6 +13,8 @@ import com.nexmo.client.sms.messages.TextMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class MessageService {
@@ -26,9 +31,10 @@ public class MessageService {
 
         SmsSubmissionResponse response = sendSMS(verificationToken);
         if (response.getMessages().get(0).getStatus() == MessageStatus.OK) {
-            return ResponseEntity.ok(new ServerResponse(true, "Verification Token Sent successfully"));
+            return ResponseEntity.ok(new ServerResponse(new ResponseData(true, "Verification Token Sent successfully")));
         } else {
-            return new ResponseEntity<>(new ServerResponse(false, "Please Try again later"), HttpStatus.INTERNAL_SERVER_ERROR);
+
+            return new ResponseEntity<>(new ErrorResponse("Please Try again later", new ValidationError()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

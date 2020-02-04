@@ -2,6 +2,7 @@ package com.anuj.qrscanner.controller;
 
 import com.anuj.qrscanner.model.db.User;
 import com.anuj.qrscanner.model.dto.request.TransactionDecisionRequestDto;
+import com.anuj.qrscanner.model.dto.request.TransactionInitiateDto;
 import com.anuj.qrscanner.model.dto.request.TransactionRequestDto;
 import com.anuj.qrscanner.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,22 @@ public class TransactionController {
     }
 
     @PostMapping(value = "/transaction")
-    public ResponseEntity<?> postTransactionDto(User user, TransactionRequestDto transactionRequestDto){
-        return transactionService.createTransaction(user,transactionRequestDto);
+    public ResponseEntity<?> postTransactionDto(User user, TransactionInitiateDto transactionInitiateDto){
+        return transactionService.createTransaction(user,transactionInitiateDto);
     }
 
-    @PostMapping(value = "/transaction_decision")
-    public ResponseEntity<?> transactionDecision(User user, TransactionDecisionRequestDto transactionDecisionRequestDto){
-        return transactionService.transactionDecision(user, transactionDecisionRequestDto);
+    @PostMapping(value = "/receiver_transaction_decision")
+    public ResponseEntity<?> receiverTransactionDecision(User user, TransactionDecisionRequestDto transactionDecisionRequestDto){
+        return transactionService.receiverTransactionDecision(user, transactionDecisionRequestDto);
+    }
+
+    @PostMapping(value = "/request_transaction")
+    public ResponseEntity<?> requestTransaction(User requestingUser, TransactionRequestDto transactionRequestDto){
+        return transactionService.requestTransaction(requestingUser, transactionRequestDto);
+    }
+
+    @PostMapping(value = "/sender_transaction_decision")
+    public ResponseEntity<?> senderTransactionDecision(User user,TransactionDecisionRequestDto transactionDecisionRequestDto){
+        return transactionService.senderTransactionDecision(user, transactionDecisionRequestDto);
     }
 }
