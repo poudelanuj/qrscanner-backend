@@ -38,7 +38,7 @@ public class Transaction {
     private Date transactionStartDate;
 
     @Basic
-    @Column(name = "transaction_accept_date", nullable = false)
+    @Column(name = "transaction_accept_date")
     private Date transactionAcceptDate;
 
     @Enumerated(EnumType.STRING)

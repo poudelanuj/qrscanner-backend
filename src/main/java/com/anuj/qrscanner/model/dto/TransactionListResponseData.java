@@ -1,6 +1,6 @@
 package com.anuj.qrscanner.model.dto;
 
-import com.anuj.qrscanner.model.dto.response.TransactionResponseDto;
+import com.anuj.qrscanner.model.dto.response.TransactionDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,9 +11,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionDtoList {
+public class TransactionListResponseData {
     @JsonProperty("sent_transaction")
-    private List<TransactionResponseDto> sentTransactionList;
+    private List<TransactionDto> sentTransactionList;
     @JsonProperty("received_transaction")
-    private List<TransactionResponseDto> receivedTransacton;
+    private List<TransactionDto> receivedTransacton;
 }

@@ -4,23 +4,27 @@ import com.anuj.qrscanner.constant.TransactionStatus;
 import com.anuj.qrscanner.constant.TransactionType;
 import com.anuj.qrscanner.model.db.Transaction;
 import com.anuj.qrscanner.model.db.User;
-import com.anuj.qrscanner.model.dto.TransactionDtoList;
+import com.anuj.qrscanner.model.dto.TransactionListResponseData;
 import com.anuj.qrscanner.model.dto.request.TransactionDecisionRequestDto;
 import com.anuj.qrscanner.model.dto.request.TransactionInitiateDto;
 import com.anuj.qrscanner.model.dto.request.TransactionRequestDto;
+import com.anuj.qrscanner.model.dto.response.TransactionDto;
+import com.anuj.qrscanner.model.dto.response.TransactionListResponseDto;
+import com.anuj.qrscanner.model.dto.response.TransactionResponseData;
 import com.anuj.qrscanner.model.dto.response.TransactionResponseDto;
 import com.anuj.qrscanner.payload.ErrorResponse;
-import com.anuj.qrscanner.payload.ServerResponse;
 import com.anuj.qrscanner.payload.ValidationError;
 import com.anuj.qrscanner.repository.TransactionRepository;
 import com.anuj.qrscanner.repository.UserRepository;
 import com.nexmo.client.sms.MessageStatus;
 import com.nexmo.client.sms.SmsSubmissionResponse;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -42,16 +46,17 @@ public class TransactionService {
         List<Transaction> transactionSentList = transactionRepository.findAllBySourceUser(user);
         List<Transaction> transactionReceivedList = transactionRepository.findAllByDestinationUser(user);
 
-        List<TransactionResponseDto> sentTransactionListDto = transactionSentList.stream().map(TransactionResponseDto::getTransactionDto).collect(Collectors.toList());
-        List<TransactionResponseDto> receivedTransactionListDto = transactionReceivedList.stream().map(TransactionResponseDto::getTransactionDto).collect(Collectors.toList());
+        List<TransactionDto> sentTransactionListDto = transactionSentList.stream().map(TransactionDto::getTransactionDto).collect(Collectors.toList());
+        List<TransactionDto> receivedTransactionListDto = transactionReceivedList.stream().map(TransactionDto::getTransactionDto).collect(Collectors.toList());
 
-        TransactionDtoList transactionDtoList = new TransactionDtoList();
+        TransactionListResponseData transactionDtoList = new TransactionListResponseData();
         transactionDtoList.setSentTransactionList(sentTransactionListDto);
         transactionDtoList.setReceivedTransacton(receivedTransactionListDto);
 
-        return ResponseEntity.ok(transactionDtoList);
+        return ResponseEntity.ok(new TransactionListResponseDto(transactionDtoList));
     }
 
+    @ApiOperation(value = "Create new transaction")
     public ResponseEntity<?> createTransaction(User user, TransactionInitiateDto transactionInitiateDto) {
         if (user.getCurrentBalance() > transactionInitiateDto.getTransactionAmount()) {
             Optional<User> userOptional = userRepository.findByPhoneNumber(transactionInitiateDto.getReceiverPhoneNumber());
@@ -66,12 +71,13 @@ public class TransactionService {
                 transaction.setTransactionType(TransactionType.SENT);
                 double currentBalance = user.getCurrentBalance();
                 user.setCurrentBalance(currentBalance - transactionInitiateDto.getTransactionAmount());
-                return ResponseEntity.ok(TransactionResponseDto.getTransactionDto(transactionRepository.save(transaction)));
+                userRepository.save(user);
+                return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transactionRepository.save(transaction)))));
             } else {
                 return sendInvitation(transactionInitiateDto.getReceiverPhoneNumber());
             }
         } else {
-            return new ResponseEntity<>(new ErrorResponse("Insufficient balance",new ValidationError()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse("Insufficient balance",new ValidationError()), HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
@@ -80,6 +86,9 @@ public class TransactionService {
         Optional<Transaction> transactionOptional = transactionRepository.findById(transactionDecisionRequestDto.getIdTransaction());
         if (transactionOptional.isPresent()) {
             Transaction transaction = transactionOptional.get();
+            if(transaction.getTransactionStatus()==TransactionStatus.COMPLETED || transaction.getTransactionStatus()==TransactionStatus.REJECTED ){
+                return new ResponseEntity<>(new ErrorResponse( "Transaction already closed", new ValidationError()), HttpStatus.FORBIDDEN);
+            }
             if (transaction.getDestinationUser().getIdUser().toString().equals(receiverUser.getIdUser().toString())) {
                 if (transactionDecisionRequestDto.isAccept()) {
                     transaction.setTransactionStatus(TransactionStatus.COMPLETED);
@@ -88,7 +97,7 @@ public class TransactionService {
                     receiverUser.setCurrentBalance(currentBalance + transaction.getTransactionValue());
                     userRepository.save(receiverUser);
                     transaction = transactionRepository.save(transaction);
-                    return ResponseEntity.ok(TransactionResponseDto.getTransactionDto(transaction));
+                    return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
                 } else {
                     transaction.setTransactionStatus(TransactionStatus.REJECTED);
                     User senderUser = transaction.getSourceUser();
@@ -96,7 +105,7 @@ public class TransactionService {
                     senderUser.setCurrentBalance(currentSenderBalance + transaction.getTransactionValue());
                     userRepository.save(senderUser);
                     transaction = transactionRepository.save(transaction);
-                    return ResponseEntity.ok(TransactionResponseDto.getTransactionDto(transaction));
+                    return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
                 }
             } else {
                 return new ResponseEntity<>(new ErrorResponse("This transaction doesn't belong to you",new ValidationError()), HttpStatus.BAD_REQUEST);
@@ -118,7 +127,7 @@ public class TransactionService {
             transaction.setTransactionStatus(TransactionStatus.PENDING);
             transaction.setTransactionStartDate(Date.from(Instant.now()));
             transaction = transactionRepository.save(transaction);
-            return ResponseEntity.ok(TransactionResponseDto.getTransactionDto(transaction));
+            return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
         } else {
             return sendInvitation(transactionRequestDto.getSenderPhoneNumber());
         }
@@ -127,7 +136,7 @@ public class TransactionService {
     public ResponseEntity<?> sendInvitation(String phoneNumber) {
         SmsSubmissionResponse response = messageService.sendInvitationSMS(phoneNumber);
         if (response.getMessages().get(0).getStatus() == MessageStatus.OK) {
-            return ResponseEntity.ok(new ErrorResponse("User not registered to the system. Invitation link has been sent to the mobile number", new ValidationError()));
+            return new ResponseEntity<>(new ErrorResponse("User not registered to the system. Invitation link has been sent to the mobile number", new ValidationError()), HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(new ErrorResponse( "User not registered, Invitation link cannot be sent.", new ValidationError()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -137,6 +146,9 @@ public class TransactionService {
         Optional<Transaction> transactionOptional = transactionRepository.findById(transactionDecisionRequestDto.getIdTransaction());
         if (transactionOptional.isPresent()) {
             Transaction transaction = transactionOptional.get();
+            if(transaction.getTransactionStatus()==TransactionStatus.COMPLETED || transaction.getTransactionStatus()==TransactionStatus.REJECTED ){
+                return new ResponseEntity<>(new ErrorResponse( "Transaction already closed", new ValidationError()), HttpStatus.FORBIDDEN);
+            }
             if (transaction.getSourceUser().getIdUser().toString().equals(senderUser.getIdUser().toString())) {
                 if (transaction.getTransactionValue() < senderUser.getCurrentBalance()) {
                     if (transactionDecisionRequestDto.isAccept()) {
@@ -149,15 +161,15 @@ public class TransactionService {
                         receiverUser.setCurrentBalance(receiverUserBalance + transaction.getTransactionValue());
                         userRepository.save(receiverUser);
                         transaction = transactionRepository.save(transaction);
-                        return ResponseEntity.ok(TransactionResponseDto.getTransactionDto(transaction));
+                        transaction.setTransactionAcceptDate(Date.from(Instant.now()));
+                        return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
                     } else {
                         transaction.setTransactionStatus(TransactionStatus.REJECTED);
-                        userRepository.save(senderUser);
                         transaction = transactionRepository.save(transaction);
-                        return ResponseEntity.ok(TransactionResponseDto.getTransactionDto(transaction));
+                        return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
                     }
                 } else {
-                    return new ResponseEntity<>(new ErrorResponse("Insufficient balance",new ValidationError()), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new ErrorResponse("Insufficient balance",new ValidationError()), HttpStatus.NOT_ACCEPTABLE);
                 }
             } else {
                 return new ResponseEntity<>(new ErrorResponse("This transaction doesn't belong to you",new ValidationError() ), HttpStatus.BAD_REQUEST);

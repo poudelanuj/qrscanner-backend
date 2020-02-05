@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionResponseDto {
-    @JsonProperty("data")
-    private TransactionResponseData transactionResponseData;
+public class TransactionResponseData {
+    @JsonProperty("success")
+    private boolean success;
+    @JsonProperty("transaction")
+    private TransactionDto transactionDto;
 }

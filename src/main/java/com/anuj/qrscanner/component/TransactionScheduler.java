@@ -24,17 +24,22 @@ public class TransactionScheduler {
     @Autowired
     UserRepository userRepository;
 
-    @Scheduled(fixedRate = 2000*60*60)
+    @Scheduled(fixedRate = 1000*60*60)
     public void transactionPendingStatusCheck() {
         List<Transaction> pendingTransactionList = transactionRepository.findAllByTransactionStatus(TransactionStatus.PENDING);
+        System.out.println("Scheduler is scheduling now");
+
         for(Transaction transaction : pendingTransactionList){
             Date transactionStartDate = transaction.getTransactionStartDate();
+            System.out.println("Pending Found");
             Calendar c = Calendar.getInstance();
             c.setTime(transactionStartDate);
-            c.add(Calendar.DATE, 3);
+            c.add(Calendar.MINUTE, 1);
             Date transactionExpireDate = c.getTime();
             if(transactionExpireDate.before(Date.from(Instant.now()))){
                 //todo remove pending transaction
+                System.out.println("Expired");
+
                 transaction.setTransactionStatus(TransactionStatus.EXPIRED);
                 if(transaction.getTransactionType()== TransactionType.SENT){
                     User sourceUser = transaction.getSourceUser();
@@ -42,6 +47,7 @@ public class TransactionScheduler {
                     sourceUser.setCurrentBalance(currentBalance+ transaction.getTransactionValue());
                     userRepository.save(sourceUser);
                 }
+                transactionRepository.save(transaction);
             }
         }
 

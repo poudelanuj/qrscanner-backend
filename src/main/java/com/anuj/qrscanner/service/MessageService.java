@@ -33,7 +33,6 @@ public class MessageService {
         if (response.getMessages().get(0).getStatus() == MessageStatus.OK) {
             return ResponseEntity.ok(new ServerResponse(new ResponseData(true, "Verification Token Sent successfully")));
         } else {
-
             return new ResponseEntity<>(new ErrorResponse("Please Try again later", new ValidationError()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
