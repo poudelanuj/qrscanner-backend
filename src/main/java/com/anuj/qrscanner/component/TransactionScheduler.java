@@ -34,7 +34,7 @@ public class TransactionScheduler {
             System.out.println("Pending Found");
             Calendar c = Calendar.getInstance();
             c.setTime(transactionStartDate);
-            c.add(Calendar.MINUTE, 1);
+            c.add(Calendar.DATE, 3);
             Date transactionExpireDate = c.getTime();
             if(transactionExpireDate.before(Date.from(Instant.now()))){
                 //todo remove pending transaction
