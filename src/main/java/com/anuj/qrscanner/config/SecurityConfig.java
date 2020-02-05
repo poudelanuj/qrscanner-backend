@@ -103,7 +103,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js")
                 .permitAll()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/auth/**", "/oauth2/**","/event/**").permitAll()
+                .antMatchers("/auth/login","/auth/otp", "/oauth2/**","/event/**").permitAll()
                 .antMatchers("/user/**").permitAll()
                 .antMatchers("/api/v1/auth/**").permitAll()
                 .antMatchers("/swagger-resources/**"," /v2/api-docs").permitAll()
