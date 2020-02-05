@@ -13,4 +13,12 @@ public class ResponseData {
     private boolean success;
     @JsonProperty("message")
     private String message;
+    @JsonProperty("otp")
+    private String otp;
+
+    public ResponseData(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
+
 }

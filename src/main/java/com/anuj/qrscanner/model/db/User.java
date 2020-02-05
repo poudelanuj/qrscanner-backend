@@ -27,8 +27,11 @@ public class User {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
-    @Column(name = "password", unique = true)
+    @Column(name = "password")
     private String password;
+
+    @Column(name = "mpin")
+    private String mpin;
 
     @Column(name = "current_balance")
     private double currentBalance;

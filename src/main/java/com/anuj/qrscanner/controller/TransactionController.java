@@ -8,11 +8,13 @@ import com.anuj.qrscanner.model.dto.response.TransactionListResponseDto;
 import com.anuj.qrscanner.model.dto.response.TransactionResponseDto;
 import com.anuj.qrscanner.payload.ErrorResponse;
 import com.anuj.qrscanner.payload.LoginResponse;
+import com.anuj.qrscanner.payload.ValidationError;
 import com.anuj.qrscanner.service.TransactionService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -31,7 +33,7 @@ public class TransactionController {
             @ApiResponse(code = 200, message = "Transaction list", response = TransactionListResponseDto.class),
     })
     @GetMapping(value = "/transactions")
-    public ResponseEntity<?> getTransactions(@ApiIgnore User user){
+    public ResponseEntity<?> getTransactions(@ApiIgnore User user) {
         return transactionService.getAllTransaction(user);
     }
 
@@ -40,12 +42,16 @@ public class TransactionController {
             @ApiResponse(code = 200, message = "New Transaction created successfully", response = TransactionResponseDto.class),
             @ApiResponse(code = 404, message = "User not registered to the system. Invitation link has been sent to the mobile number", response = ErrorResponse.class),
             @ApiResponse(code = 406, message = "Insufficient balance", response = ErrorResponse.class),
-            @ApiResponse(code = 500, message = "User not registered, Invitation link cannot be sent.", response = ErrorResponse.class)
-
+            @ApiResponse(code = 500, message = "User not registered, Invitation link cannot be sent.", response = ErrorResponse.class),
+            @ApiResponse(code = 401, message = "Invalid Mpin", response = ErrorResponse.class)
     })
     @PostMapping(value = "/transaction")
-    public ResponseEntity<?> postTransactionDto(@ApiIgnore User user, @RequestBody TransactionInitiateDto transactionInitiateDto){
-        return transactionService.createTransaction(user,transactionInitiateDto);
+    public ResponseEntity<?> postTransactionDto(@ApiIgnore User user, @RequestBody TransactionInitiateDto transactionInitiateDto) {
+        if (user.getMpin().equals(transactionInitiateDto.getMpin())) {
+            return transactionService.createTransaction(user, transactionInitiateDto);
+        } else {
+            return new ResponseEntity<>(new ErrorResponse("Invalid Mpin", new ValidationError()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @ApiOperation(value = "Transaction Decision From Receiver")
@@ -57,7 +63,7 @@ public class TransactionController {
 
     })
     @PostMapping(value = "/receiver_transaction_decision")
-    public ResponseEntity<?> receiverTransactionDecision(@ApiIgnore User user, @RequestBody TransactionDecisionRequestDto transactionDecisionRequestDto){
+    public ResponseEntity<?> receiverTransactionDecision(@ApiIgnore User user, @RequestBody TransactionDecisionRequestDto transactionDecisionRequestDto) {
         return transactionService.receiverTransactionDecision(user, transactionDecisionRequestDto);
     }
 
@@ -66,11 +72,15 @@ public class TransactionController {
             @ApiResponse(code = 200, message = "Transaction request successfully sent.", response = TransactionResponseDto.class),
             @ApiResponse(code = 404, message = "User not registered to the system. Invitation link has been sent to the mobile number", response = ErrorResponse.class),
             @ApiResponse(code = 500, message = "User not registered, Invitation link cannot be sent.", response = ErrorResponse.class),
-
+            @ApiResponse(code = 401, message = "Invalid Mpin", response = ErrorResponse.class)
     })
     @PostMapping(value = "/request_transaction")
-    public ResponseEntity<?> requestTransaction(@ApiIgnore User requestingUser,@RequestBody TransactionRequestDto transactionRequestDto){
-        return transactionService.requestTransaction(requestingUser, transactionRequestDto);
+    public ResponseEntity<?> requestTransaction(@ApiIgnore User requestingUser, @RequestBody TransactionRequestDto transactionRequestDto) {
+        if (requestingUser.getMpin().equals(transactionRequestDto.getMpin())) {
+            return transactionService.requestTransaction(requestingUser, transactionRequestDto);
+        } else {
+            return new ResponseEntity<>(new ErrorResponse("Invalid Mpin", new ValidationError()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @ApiOperation(value = "Transaction Decision From Sender")
@@ -83,7 +93,7 @@ public class TransactionController {
 
     })
     @PostMapping(value = "/sender_transaction_decision")
-    public ResponseEntity<?> senderTransactionDecision(@ApiIgnore User user, @RequestBody TransactionDecisionRequestDto transactionDecisionRequestDto){
+    public ResponseEntity<?> senderTransactionDecision(@ApiIgnore User user, @RequestBody TransactionDecisionRequestDto transactionDecisionRequestDto) {
         return transactionService.senderTransactionDecision(user, transactionDecisionRequestDto);
     }
 }

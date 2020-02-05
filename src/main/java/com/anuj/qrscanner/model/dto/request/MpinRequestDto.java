@@ -8,12 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionRequestDto {
+public class MpinRequestDto {
 
-    @JsonProperty("sender_phone_number")
-    private String senderPhoneNumber;
-    @JsonProperty("transaction_amount")
-    private double transactionAmount;
     @JsonProperty("mpin")
     private String mpin;
+
+
 }

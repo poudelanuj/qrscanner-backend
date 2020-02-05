@@ -15,5 +15,7 @@ public class TransactionInitiateDto {
     private String receiverPhoneNumber;
     @JsonProperty("transaction_amount")
     private double transactionAmount;
+    @JsonProperty("mpin")
+    private String mpin;
 
 }

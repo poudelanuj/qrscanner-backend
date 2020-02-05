@@ -7,8 +7,11 @@ import com.anuj.qrscanner.exception.RoleNotFountException;
 import com.anuj.qrscanner.model.db.Role;
 import com.anuj.qrscanner.model.db.User;
 import com.anuj.qrscanner.model.db.VerificationToken;
+import com.anuj.qrscanner.model.dto.UserDto;
 import com.anuj.qrscanner.model.dto.request.LoginRequestDto;
+import com.anuj.qrscanner.model.dto.request.MpinRequestDto;
 import com.anuj.qrscanner.model.dto.request.OtpRequestDto;
+import com.anuj.qrscanner.model.dto.response.UserResponseDto;
 import com.anuj.qrscanner.payload.*;
 import com.anuj.qrscanner.repository.UserRepository;
 import com.anuj.qrscanner.security.TokenProvider;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.HashSet;
@@ -82,7 +86,10 @@ public class AuthController {
             user = userOptional.get();
         }
         VerificationToken verificationToken = verificationTokenService.generateNewVerificationToken(user);
-        return messageService.sendMessageWithVerificationCode(verificationToken);
+
+//        return messageService.sendMessageWithVerificationCode(verificationToken);
+        return ResponseEntity.ok(new ServerResponse(new ResponseData(true, "Verification Token Sent successfully", verificationToken.getToken())));
+
 
     }
 
@@ -128,6 +135,16 @@ public class AuthController {
 
         }
         return new ResponseEntity<>(new ErrorResponse("Internal server error",new ValidationError()),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ApiOperation(value = "Setting Mpin")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Mpin successfully set", response = UserResponseDto.class)
+    })
+    @PostMapping(value = "/mpin")
+    private ResponseEntity<?> setMpin(@ApiIgnore User user, @RequestBody MpinRequestDto mpinRequestDto){
+        user.setMpin(mpinRequestDto.getMpin());
+        return ResponseEntity.ok(new UserResponseDto(UserDto.getUserDto(userRepository.save(user))));
     }
 
 

@@ -22,7 +22,7 @@ public class UserController {
 
     @ApiOperation(value = "Get User Info")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Transaction initiated successfully", response = TransactionResponseDto.class),
+            @ApiResponse(code = 200, message = "Transaction initiated successfully", response = UserResponseDto.class),
        })
     @GetMapping(value = "/user")
     public ResponseEntity<?> getUser(@ApiIgnore  User user){
