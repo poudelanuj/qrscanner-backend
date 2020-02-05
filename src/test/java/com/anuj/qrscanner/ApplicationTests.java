@@ -1,4 +1,4 @@
-package com.dallotech;
+package com.anuj.qrscanner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
