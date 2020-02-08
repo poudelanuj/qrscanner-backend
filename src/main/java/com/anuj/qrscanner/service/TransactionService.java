@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.crypto.Data;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,17 +44,14 @@ public class TransactionService {
 
 
     public ResponseEntity<?> getAllTransaction(User user) {
-        List<Transaction> transactionSentList = transactionRepository.findAllBySourceUser(user);
-        List<Transaction> transactionReceivedList = transactionRepository.findAllByDestinationUser(user);
+        List<Transaction> transactionList = transactionRepository.findAllBySourceUserOrDestinationUser(user,user);
+        List<TransactionDto> transactionDtoList = new ArrayList<>();
+        for(Transaction transaction: transactionList){
+            transactionDtoList.add(TransactionDto.getTransactionDtoWithUser(transaction,user));
+        }
 
-        List<TransactionDto> sentTransactionListDto = transactionSentList.stream().map(TransactionDto::getTransactionDto).collect(Collectors.toList());
-        List<TransactionDto> receivedTransactionListDto = transactionReceivedList.stream().map(TransactionDto::getTransactionDto).collect(Collectors.toList());
 
-        TransactionListResponseData transactionDtoList = new TransactionListResponseData();
-        transactionDtoList.setSentTransactionList(sentTransactionListDto);
-        transactionDtoList.setReceivedTransacton(receivedTransactionListDto);
-
-        return ResponseEntity.ok(new TransactionListResponseDto(transactionDtoList));
+        return ResponseEntity.ok(new TransactionListResponseDto(new TransactionListResponseData(transactionDtoList)));
     }
 
     @ApiOperation(value = "Create new transaction")
@@ -134,12 +132,13 @@ public class TransactionService {
     }
 
     public ResponseEntity<?> sendInvitation(String phoneNumber) {
-        SmsSubmissionResponse response = messageService.sendInvitationSMS(phoneNumber);
-        if (response.getMessages().get(0).getStatus() == MessageStatus.OK) {
-            return new ResponseEntity<>(new ErrorResponse("User not registered to the system. Invitation link has been sent to the mobile number", new ValidationError()), HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(new ErrorResponse( "User not registered, Invitation link cannot be sent.", new ValidationError()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(new ErrorResponse("User not registered to the system. Invitation link has been sent to the mobile number", new ValidationError()), HttpStatus.NOT_FOUND);
+//        SmsSubmissionResponse response = messageService.sendInvitationSMS(phoneNumber);
+//        if (response.getMessages().get(0).getStatus() == MessageStatus.OK) {
+//            return new ResponseEntity<>(new ErrorResponse("User not registered to the system. Invitation link has been sent to the mobile number", new ValidationError()), HttpStatus.NOT_FOUND);
+//        } else {
+//            return new ResponseEntity<>(new ErrorResponse( "User not registered, Invitation link cannot be sent.", new ValidationError()), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
     }
 
     public ResponseEntity<?> senderTransactionDecision(User senderUser, TransactionDecisionRequestDto transactionDecisionRequestDto) {

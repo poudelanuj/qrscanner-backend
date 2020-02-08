@@ -12,8 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionListResponseData {
-    @JsonProperty("sent_transaction")
-    private List<TransactionDto> sentTransactionList;
-    @JsonProperty("received_transaction")
-    private List<TransactionDto> receivedTransacton;
+    @JsonProperty("transactions")
+    private List<TransactionDto> transactionDtoList;
+
 }

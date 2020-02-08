@@ -3,6 +3,7 @@ package com.anuj.qrscanner.model.dto.response;
 import com.anuj.qrscanner.constant.TransactionStatus;
 import com.anuj.qrscanner.constant.TransactionType;
 import com.anuj.qrscanner.model.db.Transaction;
+import com.anuj.qrscanner.model.db.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,8 @@ public class TransactionDto {
     private TransactionStatus transactionStatus;
     @JsonProperty("transaction_type")
     private TransactionType transactionType;
+    @JsonProperty("own")
+    private boolean own;
     @JsonProperty("sender_phone_number")
     private String senderPhoneNumber;
     @JsonProperty("receiver_phone_number")
@@ -30,6 +33,17 @@ public class TransactionDto {
     private Date transactionStartDate;
     @JsonProperty("transaction_accept_time")
     private Date transactionAcceptDate;
+
+    public static TransactionDto getTransactionDtoWithUser(Transaction transaction, User user){
+        TransactionDto transactionDto = getTransactionDto(transaction);
+        if(transaction.getSourceUser().getPhoneNumber().equals(user.getPhoneNumber())){
+            transactionDto.setOwn(true);
+        }else {
+            transactionDto.setOwn(false);
+        }
+        return transactionDto;
+
+    }
 
     public static TransactionDto getTransactionDto(Transaction transaction){
         TransactionDto transactionDto = new TransactionDto();
@@ -42,6 +56,7 @@ public class TransactionDto {
         transactionDto.setTransactionStartDate(transaction.getTransactionStartDate());
         transactionDto.setTransactionAcceptDate(transaction.getTransactionAcceptDate());
         return transactionDto;
+
     }
 
 }

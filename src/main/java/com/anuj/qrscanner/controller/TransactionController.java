@@ -43,11 +43,15 @@ public class TransactionController {
             @ApiResponse(code = 404, message = "User not registered to the system. Invitation link has been sent to the mobile number", response = ErrorResponse.class),
             @ApiResponse(code = 406, message = "Insufficient balance", response = ErrorResponse.class),
             @ApiResponse(code = 500, message = "User not registered, Invitation link cannot be sent.", response = ErrorResponse.class),
-            @ApiResponse(code = 401, message = "Invalid Mpin", response = ErrorResponse.class)
+            @ApiResponse(code = 401, message = "Invalid Mpin", response = ErrorResponse.class),
+            @ApiResponse(code = 403, message = "Cannot send balance to your own number", response = ErrorResponse.class)
     })
     @PostMapping(value = "/transaction")
     public ResponseEntity<?> postTransactionDto(@ApiIgnore User user, @RequestBody TransactionInitiateDto transactionInitiateDto) {
         if (user.getMpin().equals(transactionInitiateDto.getMpin())) {
+            if(user.getPhoneNumber().equals(transactionInitiateDto.getReceiverPhoneNumber())){
+                return new ResponseEntity<>(new ErrorResponse("Cannot send balance to your own number",new ValidationError()), HttpStatus.FORBIDDEN);
+            }
             return transactionService.createTransaction(user, transactionInitiateDto);
         } else {
             return new ResponseEntity<>(new ErrorResponse("Invalid Mpin", new ValidationError()), HttpStatus.BAD_REQUEST);
@@ -72,11 +76,16 @@ public class TransactionController {
             @ApiResponse(code = 200, message = "Transaction request successfully sent.", response = TransactionResponseDto.class),
             @ApiResponse(code = 404, message = "User not registered to the system. Invitation link has been sent to the mobile number", response = ErrorResponse.class),
             @ApiResponse(code = 500, message = "User not registered, Invitation link cannot be sent.", response = ErrorResponse.class),
-            @ApiResponse(code = 401, message = "Invalid Mpin", response = ErrorResponse.class)
+            @ApiResponse(code = 401, message = "Invalid Mpin", response = ErrorResponse.class),
+            @ApiResponse(code = 403, message = "Cannot request the balance from your own number", response = ErrorResponse.class)
+
     })
     @PostMapping(value = "/request_transaction")
     public ResponseEntity<?> requestTransaction(@ApiIgnore User requestingUser, @RequestBody TransactionRequestDto transactionRequestDto) {
         if (requestingUser.getMpin().equals(transactionRequestDto.getMpin())) {
+            if(requestingUser.getPhoneNumber().equals(transactionRequestDto.getSenderPhoneNumber())){
+                return new ResponseEntity<>(new ErrorResponse("Cannot request the balance from your own nmber",new ValidationError()),HttpStatus.FORBIDDEN);
+            }
             return transactionService.requestTransaction(requestingUser, transactionRequestDto);
         } else {
             return new ResponseEntity<>(new ErrorResponse("Invalid Mpin", new ValidationError()), HttpStatus.BAD_REQUEST);
