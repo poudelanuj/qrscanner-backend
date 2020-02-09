@@ -35,17 +35,6 @@ public class TransactionDto {
     private Date transactionAcceptDate;
 
     public static TransactionDto getTransactionDtoWithUser(Transaction transaction, User user){
-        TransactionDto transactionDto = getTransactionDto(transaction);
-        if(transaction.getSourceUser().getPhoneNumber().equals(user.getPhoneNumber())){
-            transactionDto.setOwn(true);
-        }else {
-            transactionDto.setOwn(false);
-        }
-        return transactionDto;
-
-    }
-
-    public static TransactionDto getTransactionDto(Transaction transaction){
         TransactionDto transactionDto = new TransactionDto();
         transactionDto.setIdTransaction(transaction.getIdTransaction());
         transactionDto.setTransactionValue(transaction.getTransactionValue());
@@ -55,6 +44,11 @@ public class TransactionDto {
         transactionDto.setReceiverPhoneNumber(transaction.getDestinationUser().getPhoneNumber());
         transactionDto.setTransactionStartDate(transaction.getTransactionStartDate());
         transactionDto.setTransactionAcceptDate(transaction.getTransactionAcceptDate());
+        if(transaction.getSourceUser().getPhoneNumber().equals(user.getPhoneNumber())){
+            transactionDto.setOwn(true);
+        }else {
+            transactionDto.setOwn(false);
+        }
         return transactionDto;
 
     }

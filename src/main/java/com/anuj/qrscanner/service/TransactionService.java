@@ -67,7 +67,7 @@ public class TransactionService {
                 double currentBalance = user.getCurrentBalance();
                 user.setCurrentBalance(currentBalance - transactionInitiateDto.getTransactionAmount());
                 userRepository.save(user);
-                return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transactionRepository.save(transaction)))));
+                return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDtoWithUser(transactionRepository.save(transaction),user))));
             } else {
                 return sendInvitation(transactionInitiateDto.getReceiverPhoneNumber());
             }
@@ -92,7 +92,7 @@ public class TransactionService {
                     receiverUser.setCurrentBalance(currentBalance + transaction.getTransactionValue());
                     userRepository.save(receiverUser);
                     transaction = transactionRepository.save(transaction);
-                    return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
+                    return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDtoWithUser(transaction,receiverUser))));
                 } else {
                     transaction.setTransactionStatus(TransactionStatus.REJECTED);
                     User senderUser = transaction.getSourceUser();
@@ -100,7 +100,7 @@ public class TransactionService {
                     senderUser.setCurrentBalance(currentSenderBalance + transaction.getTransactionValue());
                     userRepository.save(senderUser);
                     transaction = transactionRepository.save(transaction);
-                    return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
+                    return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDtoWithUser(transaction,receiverUser))));
                 }
             } else {
                 return new ResponseEntity<>(new ErrorResponse("This transaction doesn't belong to you",new ValidationError()), HttpStatus.BAD_REQUEST);
@@ -122,7 +122,7 @@ public class TransactionService {
             transaction.setTransactionStatus(TransactionStatus.PENDING);
             transaction.setTransactionStartDate(Date.from(Instant.now()));
             transaction = transactionRepository.save(transaction);
-            return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
+            return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDtoWithUser(transaction,requestingUser))));
         } else {
             return sendInvitation(transactionRequestDto.getSenderPhoneNumber());
         }
@@ -158,11 +158,11 @@ public class TransactionService {
                         userRepository.save(receiverUser);
                         transaction = transactionRepository.save(transaction);
                         transaction.setTransactionAcceptDate(Date.from(Instant.now()));
-                        return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
+                        return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDtoWithUser(transaction,senderUser))));
                     } else {
                         transaction.setTransactionStatus(TransactionStatus.REJECTED);
                         transaction = transactionRepository.save(transaction);
-                        return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDto(transaction))));
+                        return ResponseEntity.ok(new TransactionResponseDto(new TransactionResponseData(true,TransactionDto.getTransactionDtoWithUser(transaction,senderUser))));
                     }
                 } else {
                     return new ResponseEntity<>(new ErrorResponse("Insufficient balance",new ValidationError()), HttpStatus.NOT_ACCEPTABLE);
