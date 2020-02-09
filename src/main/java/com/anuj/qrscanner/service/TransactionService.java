@@ -41,8 +41,7 @@ public class TransactionService {
 
 
     public ResponseEntity<?> getAllTransaction(User user) {
-        List<Transaction> transactionList = transactionRepository.findAllBySourceUserOrDestinationUser(user,user);
-        Collections.reverse(transactionList);
+        List<Transaction> transactionList = transactionRepository.findAllBySourceUserOrDestinationUserOrderByTransactionStartDateDesc(user,user);
         List<TransactionDto> transactionDtoList = new ArrayList<>();
         for(Transaction transaction: transactionList){
             transactionDtoList.add(TransactionDto.getTransactionDtoWithUser(transaction,user));

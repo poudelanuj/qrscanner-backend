@@ -15,6 +15,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findAllByTransactionStatus(TransactionStatus transactionStatus);
 
-    List<Transaction> findAllBySourceUserOrDestinationUser(User sourceUser, User destinationUser)  ;
+    List<Transaction> findAllBySourceUserOrDestinationUserOrderByTransactionStartDateDesc(User sourceUser, User destinationUser)  ;
 
 }
