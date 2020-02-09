@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.crypto.Data;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +42,7 @@ public class TransactionService {
 
     public ResponseEntity<?> getAllTransaction(User user) {
         List<Transaction> transactionList = transactionRepository.findAllBySourceUserOrDestinationUser(user,user);
+        Collections.reverse(transactionList);
         List<TransactionDto> transactionDtoList = new ArrayList<>();
         for(Transaction transaction: transactionList){
             transactionDtoList.add(TransactionDto.getTransactionDtoWithUser(transaction,user));
