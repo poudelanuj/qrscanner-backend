@@ -1,6 +1,6 @@
 package com.anuj.qrscanner.model.internal;
 
-import com.anuj.qrscanner.model.User;
+import com.anuj.qrscanner.model.db.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

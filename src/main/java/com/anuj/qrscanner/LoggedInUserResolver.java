@@ -1,7 +1,7 @@
 package com.anuj.qrscanner;
 
 import com.anuj.qrscanner.exception.AuthenticationException;
-import com.anuj.qrscanner.model.User;
+import com.anuj.qrscanner.model.db.User;
 import com.anuj.qrscanner.security.UserPrincipal;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
